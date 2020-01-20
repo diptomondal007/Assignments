@@ -2,12 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gorilla/mux"
 	todo_crud_api_with_go "todo_crud.com"
 )
 
@@ -17,8 +18,8 @@ type Res struct {
 	ResBody string `json:"response"`
 }
 
-var errorRes = Res{ResBody:"Operation Failed"}
-var successRes = Res{ResBody:"Operation successful"}
+var errorRes = Res{ResBody: "Operation Failed"}
+var successRes = Res{ResBody: "Operation successful"}
 
 func getTodo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -38,10 +39,11 @@ func getTodo(w http.ResponseWriter, r *http.Request) {
 func postTodo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	responseBody, err := ioutil.ReadAll(r.Body)
-	if err != nil{
+	if err != nil {
 		panic("Json Reading failed")
 	}
 	var todo todo_crud_api_with_go.ToDo
+	todo.CreatedOn = time.Now()
 	json.Unmarshal(responseBody, &todo)
 	Todos = append(Todos, todo)
 	json.NewEncoder(w).Encode(todo)
@@ -57,14 +59,14 @@ func deleteTodo(w http.ResponseWriter, r *http.Request) {
 				found = true
 			}
 		}
-		if(found){
+		if found {
 			keyInt, err := strconv.Atoi(key.Get("id"))
-			if err !=nil{
+			if err != nil {
 				json.NewEncoder(w).Encode(errorRes)
 			}
-			Todos = append(Todos[:keyInt],Todos[keyInt+1:]...)
+			Todos = append(Todos[:keyInt], Todos[keyInt+1:]...)
 			json.NewEncoder(w).Encode(successRes)
-		}else {
+		} else {
 			json.NewEncoder(w).Encode(errorRes)
 		}
 	} else {
@@ -82,9 +84,9 @@ func updateTodo(w http.ResponseWriter, r *http.Request) {
 				found = true
 			}
 		}
-		if(found){
+		if found {
 			keyInt, err := strconv.Atoi(key.Get("id"))
-			if err !=nil{
+			if err != nil {
 				json.NewEncoder(w).Encode(errorRes)
 			}
 
@@ -93,7 +95,7 @@ func updateTodo(w http.ResponseWriter, r *http.Request) {
 			json.Unmarshal(requestBody, &anotherTodo)
 			Todos[keyInt] = anotherTodo
 			json.NewEncoder(w).Encode(successRes)
-		}else {
+		} else {
 			json.NewEncoder(w).Encode(errorRes)
 		}
 	} else {
